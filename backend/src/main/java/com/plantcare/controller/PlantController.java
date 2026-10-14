@@ -1,5 +1,26 @@
+
 package com.plantcare.controller;
 
+import tools.jackson.databind.JsonNode;
+import com.plantcare.services.PlantService;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/plants")
 public class PlantController {
-    
+
+    private final PlantService plantService;
+
+    public PlantController(PlantService plantService) {
+        this.plantService = plantService;
+    }
+
+    @GetMapping("/search")
+    public JsonNode searchPlants(@RequestParam String q) {
+        return plantService.searchPlants(q);
+    }
 }
