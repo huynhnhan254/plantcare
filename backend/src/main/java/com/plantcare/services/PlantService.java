@@ -1,8 +1,10 @@
 package com.plantcare.services;
 
-import tools.jackson.databind.JsonNode;
 import com.plantcare.client.TreflePlantApiClient;
+import com.plantcare.dtos.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PlantService {
@@ -13,7 +15,17 @@ public class PlantService {
         this.trefleClient = trefleClient;
     }
 
-    public JsonNode searchPlants(String query) {
-        return trefleClient.searchPlants(query);
+    public List<PlantDto> searchPlants(String query) {
+        TrefleSearchResponse response =
+                trefleClient.searchPlants(query);
+
+        return response.data().stream()
+                .map(plant -> new PlantDto(
+                        plant.commonName(),
+                        plant.scientificName(),
+                        plant.family(),
+                        plant.imageUrl()
+                ))
+                .toList();
     }
 }

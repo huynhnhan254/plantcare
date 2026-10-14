@@ -1,8 +1,9 @@
-
 package com.plantcare.controller;
 
-import tools.jackson.databind.JsonNode;
+import com.plantcare.dtos.PlantDto;
 import com.plantcare.services.PlantService;
+
+import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,11 @@ public class PlantController {
     }
 
     @GetMapping("/search")
-    public JsonNode searchPlants(@RequestParam String q) {
-        return plantService.searchPlants(q);
+    public List<PlantDto> searchPlants(
+            @RequestParam
+            @jakarta.validation.constraints.NotBlank
+            String q) {
+
+        return plantService.searchPlants(q.trim());
     }
 }

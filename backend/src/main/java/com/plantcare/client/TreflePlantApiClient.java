@@ -1,10 +1,10 @@
 
 package com.plantcare.client;
 
-import tools.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import com.plantcare.dtos.TrefleSearchResponse;
 
 @Component
 public class TreflePlantApiClient {
@@ -23,7 +23,7 @@ public class TreflePlantApiClient {
         this.token = token;
     }
 
-    public JsonNode searchPlants(String query) {
+    public TrefleSearchResponse searchPlants(String query) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/plants/search")
@@ -31,6 +31,6 @@ public class TreflePlantApiClient {
                         .queryParam("token", token)
                         .build())
                 .retrieve()
-                .body(JsonNode.class);
+                .body(TrefleSearchResponse.class);
     }
 }
