@@ -1,7 +1,53 @@
 
+import { useState } from 'react'
 import './App.css'
 
+const API_URL = 'http://localhost:8080/api/v1/plants/search'
+
 function App() {
+  const [query, setQuery] = useState('')
+  const [plants, setPlants] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [searched, setSearched] = useState(false)
+
+  async function handleSearch(event) {
+    event.preventDefault()
+
+    const searchTerm = query.trim()
+
+    if (!searchTerm) {
+      setError('Please enter a plant name to search.')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    setSearched(true)
+    setPlants([])
+
+    try {
+      const response = await fetch(
+        `${API_URL}?q=${encodeURIComponent(searchTerm)}`
+      )
+
+      if (!response.ok) {
+        throw new Error('Unable to search for plants. Please try again.')
+      }
+
+      const data = await response.json()
+      setPlants(data)
+    } catch (err) {
+      setError(
+        err instanceof TypeError
+          ? 'Cannot connect to the server. Make sure your Spring Boot backend is running.'
+          : err.message
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="app">
       <header className="navbar">
@@ -30,13 +76,17 @@ function App() {
             start building your own plant collection.
           </p>
 
-          <form className="search-form">
+          <form className="search-form" onSubmit={handleSearch}>
             <input
               type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder="Search plants, e.g. Monstera"
               aria-label="Search plants"
             />
-            <button type="submit">Search</button>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Searching...' : 'Search'}
+            </button>
           </form>
         </section>
 
@@ -49,12 +99,68 @@ function App() {
             <p>Discover your next favorite plant.</p>
           </div>
 
-          <div className="empty-state">
-            <h3>Your plant discoveries start here.</h3>
-            <p>
-              Search for a plant to explore species and their details.
-            </p>
-          </div>
+          {error && <p className="error-message">{error}</p>}
+
+          {loading && (
+            <p className="status-message">Finding plants for you...</p>
+          )}
+
+          {!loading && !error && searched && plants.length === 0 && (
+            <div className="empty-state">
+              <h3>No plants found.</h3>
+              <p>Try another plant name, such as Monstera or Rose.</p>
+            </div>
+          )}
+
+          {!loading && !error && !searched && (
+            <div className="empty-state">
+              <h3>Your plant discoveries start here.</h3>
+              <p>
+                Search for a plant to explore species and their details.
+              </p>
+            </div>
+          )}
+
+          {!loading && plants.length > 0 && (
+            <div className="plant-grid">
+              {plants.map((plant, index) => (
+                <article
+                  className="plant-card"
+                  key={plant.scientificName || `${plant.commonName}-${index}`}
+                >
+                  {plant.imageUrl ? (
+                    <img
+                      className="plant-image"
+                      src={plant.imageUrl}
+                      alt={plant.commonName || plant.scientificName}
+                    />
+                  ) : (
+                    <div className="plant-image image-placeholder">
+                      Plant image unavailable
+                    </div>
+                  )}
+
+                  <div className="plant-card-content">
+                    <h3>
+                      {plant.commonName || plant.scientificName || 'Unknown plant'}
+                    </h3>
+
+                    {plant.commonName && plant.scientificName && (
+                      <p className="scientific-name">
+                        {plant.scientificName}
+                      </p>
+                    )}
+
+                    {plant.family && (
+                      <p className="plant-family">
+                        Family: {plant.family}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </main>
 
