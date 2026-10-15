@@ -3,6 +3,8 @@ package com.plantcare.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import com.plantcare.dtos.TrefleSearchResponse;
 
@@ -26,6 +28,9 @@ public class TreflePlantApiClient {
         this.rateLimiter = rateLimiter;
     }
 
+    @Cacheable(
+        cacheNames = "plantSearches",
+        key = "#query.trim().toLowerCase()")
     public TrefleSearchResponse searchPlants(String query) {
         rateLimiter.acquire();
 
