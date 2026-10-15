@@ -1,9 +1,9 @@
-
 package com.plantcare.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
 import com.plantcare.dtos.TrefleSearchResponse;
 
 @Component
@@ -11,19 +11,24 @@ public class TreflePlantApiClient {
 
     private final RestClient restClient;
     private final String token;
+    private final TrefleRateLimiter rateLimiter;
 
     public TreflePlantApiClient(
             @Value("${trefle.api.base-url}") String baseUrl,
-            @Value("${trefle.api.token}") String token) {
+            @Value("${trefle.api.token}") String token,
+            TrefleRateLimiter rateLimiter) {
 
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
 
         this.token = token;
+        this.rateLimiter = rateLimiter;
     }
 
     public TrefleSearchResponse searchPlants(String query) {
+        rateLimiter.acquire();
+
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/plants/search")

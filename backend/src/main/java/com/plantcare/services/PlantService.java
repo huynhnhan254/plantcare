@@ -21,10 +21,11 @@ public class PlantService {
 
         return response.data().stream()
                 .map(plant -> new PlantDto(
-                        plant.commonName(),
-                        plant.scientificName(),
-                        plant.family(),
-                        plant.imageUrl()
+                    plant.id(),
+                    plant.commonName(),
+                    plant.scientificName(),
+                    plant.family(),
+                    plant.imageUrl()
                 ))
                 .toList();
     }
