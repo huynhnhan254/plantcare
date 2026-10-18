@@ -3,6 +3,7 @@ package com.plantcare.services;
 import com.plantcare.client.TreflePlantApiClient;
 import com.plantcare.dtos.*;
 import org.springframework.stereotype.Service;
+// import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -29,4 +30,32 @@ public class PlantService {
                 ))
                 .toList();
     }
+    
+    public PlantDetailsDto getPlantDetails(Long id) {
+        TreflePlantDetailsResponse response = trefleClient.getPlantDetails(id);
+
+        TreflePlantDetailsDto plant = response.data();
+
+        return new PlantDetailsDto(
+                id,
+                plant.commonName(),
+                plant.scientificName(),
+                plant.mainSpecies() != null
+                        ? plant.mainSpecies().family()
+                        : null,
+                plant.imageUrl(),
+                plant.year(),
+                plant.author(),
+                plant.observations(),
+                plant.familyCommonName(),
+                plant.bibliography(),
+                plant.mainSpecies() != null
+                        ? plant.mainSpecies().status()
+                        : null,
+                plant.mainSpecies() != null
+                        ? plant.mainSpecies().rank()
+                        : null
+        );
+    }
+
 }

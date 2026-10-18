@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.CacheEvict;
+// import org.springframework.cache.annotation.CacheEvict;
 
+import tools.jackson.databind.JsonNode;
+
+import com.plantcare.dtos.TreflePlantDetailsResponse;
 import com.plantcare.dtos.TrefleSearchResponse;
 
 @Component
@@ -42,5 +45,21 @@ public class TreflePlantApiClient {
                         .build())
                 .retrieve()
                 .body(TrefleSearchResponse.class);
+    }
+
+    @Cacheable (
+        cacheNames = "plantDetails",
+        key = "#id"
+    )
+    public TreflePlantDetailsResponse getPlantDetails(long id) {
+        rateLimiter.acquire();
+
+        return restClient.get()
+            .uri(uriBuilder -> uriBuilder
+                    .path("/plants/{id}")
+                    .queryParam("token", token)
+                    .build(id))
+            .retrieve()
+            .body(TreflePlantDetailsResponse.class);
     }
 }
