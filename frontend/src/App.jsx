@@ -1,8 +1,7 @@
-
 import { useState } from 'react'
 import './App.css'
 
-const API_URL = 'http://localhost:8080/api/v1/plants/search'
+import { searchPlants, getPlantDetails } from './services/plantServices'
 
 function App() {
   const [query, setQuery] = useState('')
@@ -10,6 +9,8 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [searched, setSearched] = useState(false)
+  const [selectedPlant, setSelectedPlant] = useState(null)
+  const [detailsLoading, setDetailsLoading] = useState(false)
 
   async function handleSearch(event) {
     event.preventDefault()
@@ -27,15 +28,7 @@ function App() {
     setPlants([])
 
     try {
-      const response = await fetch(
-        `${API_URL}?q=${encodeURIComponent(searchTerm)}`
-      )
-
-      if (!response.ok) {
-        throw new Error('Unable to search for plants. Please try again.')
-      }
-
-      const data = await response.json()
+      const data = await searchPlants(searchTerm)
       setPlants(data)
     } catch (err) {
       setError(

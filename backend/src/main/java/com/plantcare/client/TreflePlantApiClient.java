@@ -6,8 +6,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.cache.annotation.Cacheable;
 // import org.springframework.cache.annotation.CacheEvict;
 
-import tools.jackson.databind.JsonNode;
-
 import com.plantcare.dtos.TreflePlantDetailsResponse;
 import com.plantcare.dtos.TrefleSearchResponse;
 
